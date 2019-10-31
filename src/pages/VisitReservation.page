@@ -1,0 +1,84 @@
+<!--
+  @File Name          : VisitReservation.page
+  @Description        : 
+  @Author             : Tom Tanaka
+  @Group              : 
+  @Last Modified By   : Tom Tanaka
+  @Last Modified On   : 2019/10/24 17:32:24
+  @Modification Log   : 
+  Ver       Date            Author      		    Modification
+  1.0    2019/10/23   　　　Tom Tanaka     　　　　　Initial Version
+-->
+<apex:page controller="VisitReservation_Controller" action="{!pageLoad}">
+<link href="{!$Resource.fullCalendarCSS}" rel="stylesheet" />
+<link href="{!$Resource.fullCalendarPrintCSS}" rel="stylesheet" media="print" />
+<script src="{!$Resource.jQueryMiniJS}"></script>
+<script src="{!$Resource.jQueryUiMiniJS}"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+
+
+  <script src="{!$Resource.fullCalendarJS}"></script>
+<apex:sectionHeader title="来店予約カレンダー"/>
+  
+<div id="calendar"></div>
+<style>
+        #cal-options {float:left;}
+        #cal-legend { float:right;}
+        #cal-legend ul {margin:0;padding:0;list-style:none;}
+        #cal-legend ul li {margin:0;padding:5px;float:left;}
+        #cal-legend ul li span {display:block; height:16px; width:16px; margin-right:4px; float:left; border-radius:4px;}
+        #calendar {margin-top:20px;}
+        #calendar a:hover {color:#fff !important;}
+         
+        .fc-event-inner {padding:3px;}
+        .reserved {background:red;border-color:red;}
+        .available {background:green;border-color:green;}
+        .personal {background:#1797c0;border-color:#1797c0;}
+    </style>
+     
+    
+    <apex:outputPanel id="calPanel">
+        <apex:form >
+            <div id="cal-options">
+                <apex:commandButton value="{!IF(includeMyEvents,'予約を非表示にする','予約を表示する')}" action="{!toggleMyEvents}"/>
+            </div>
+            <div id="cal-legend">
+                <ul>
+                    <li><span class="reserved"></span>予約済み</li>
+                    <li><span class="available"></span>予約空き</li>
+                    <!---<li style="{!IF(includeMyEvents,'','display:none')}"><span class="personal"></span>My Events</li>-->
+                </ul>
+                <div style="clear:both;"><!--fix floats--></div>
+            </div>
+            <div style="clear:both;"><!--fix floats--></div>
+            <div id="calendar"></div>
+        </apex:form>
+    </apex:outputPanel>
+    <script>
+        //We need to wrap everything in a doc.ready function so that the code fires after the DOM is loaded
+        $(document).ready(function() {  
+            //Call the fullCallendar method. You can replace the '#calendar' with the ID of the dom element where you want the calendar to go.
+            $('#calendar').fullCalendar({
+                header: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'month,agendaWeek,agendaDay'
+                },
+                editable: false,
+                events:
+                [
+                    //At run time, this APEX Repeat will reneder the array elements for the events array
+                    <apex:repeat value="{!events}" var="e">
+                        {
+                            title: "{!e.title}",
+                            start: '{!e.startString}',
+                            end: '{!e.endString}',
+                            allDay: {!e.allDay}
+                        },
+                    </apex:repeat>
+                ]
+            });
+             
+        });
+    </script>
+</apex:page>
